@@ -20,8 +20,15 @@ builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Str
 builder.Services.Configure<LiffSettings>(builder.Configuration.GetSection("Liff"));
 
 // Database
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? builder.Configuration["DATABASE_URL"];
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var databaseUrl = builder.Configuration["DATABASE_URL"];
+if (string.IsNullOrEmpty(connectionString) && !string.IsNullOrEmpty(databaseUrl))
+{
+    // Convert Railway's DATABASE_URL (postgresql://user:pass@host:port/db) to Npgsql format
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+}
 builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(connectionString));
 
 // HttpClient for LINE API

@@ -14,6 +14,10 @@ using UnmannedLockSystem.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Railway sets PORT env var
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://+:{port}");
+
 // Configuration
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
@@ -139,12 +143,23 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // Auto-migrate and seed
-using (var scope = app.Services.CreateScope())
+try
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<AppDbContext>>();
+    logger.LogInformation("Connection string: {Cs}", connectionString?[..Math.Min(50, connectionString?.Length ?? 0)] + "...");
     db.Database.Migrate();
     await DataSeeder.SeedAsync(db);
+    logger.LogInformation("Database migration and seeding completed successfully");
 }
+catch (Exception ex)
+{
+    app.Logger.LogError(ex, "Failed to migrate/seed database. App will start without DB.");
+}
+
+// Health check endpoint
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", time = DateTime.UtcNow }));
 
 // Middleware pipeline
 app.UseSwagger();

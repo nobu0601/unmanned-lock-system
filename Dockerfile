@@ -45,5 +45,5 @@ COPY --from=frontend-build /frontend/admin-app/dist ./wwwroot/admin/
 RUN echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Unmanned Lock System</title></head><body style="font-family:sans-serif;text-align:center;padding:60px"><h1>Unmanned Lock System</h1><ul style="list-style:none;padding:0"><li style="margin:16px"><a href="/liff/">Customer (LIFF)</a></li><li style="margin:16px"><a href="/admin/">Admin Dashboard</a></li><li style="margin:16px"><a href="/device/">Device Scanner</a></li><li style="margin:16px"><a href="/swagger/">API Docs</a></li></ul></body></html>' > ./wwwroot/index.html
 
 EXPOSE 8080
-ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_URLS=http://+:${PORT:-8080}
 ENTRYPOINT ["dotnet", "UnmannedLockSystem.Api.dll"]

@@ -158,21 +158,30 @@ catch (Exception ex)
     app.Logger.LogError(ex, "Failed to migrate/seed database. App will start without DB.");
 }
 
-// Health check endpoint
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", time = DateTime.UtcNow }));
-
-// Debug: list wwwroot files
-app.MapGet("/debug/files", () =>
+// Health check + debug info
+app.MapGet("/health", () =>
 {
-    var webroot = app.Environment.WebRootPath ?? "wwwroot";
-    if (!Directory.Exists(webroot))
-        return Results.Ok(new { error = "wwwroot not found", path = webroot, cwd = Directory.GetCurrentDirectory() });
-
-    var files = Directory.GetFiles(webroot, "*", SearchOption.AllDirectories)
-        .Select(f => f.Replace(webroot, "").Replace("\\", "/"))
-        .OrderBy(f => f)
-        .ToList();
-    return Results.Ok(new { webroot, cwd = Directory.GetCurrentDirectory(), fileCount = files.Count, files });
+    var webroot = app.Environment.WebRootPath;
+    var cwd = Directory.GetCurrentDirectory();
+    var webrootExists = webroot != null && Directory.Exists(webroot);
+    var files = new List<string>();
+    if (webrootExists)
+    {
+        files = Directory.GetFiles(webroot!, "*", SearchOption.AllDirectories)
+            .Select(f => f.Replace(webroot!, "").Replace("\\", "/"))
+            .OrderBy(f => f)
+            .ToList();
+    }
+    return Results.Ok(new
+    {
+        status = "healthy",
+        time = DateTime.UtcNow,
+        webRootPath = webroot,
+        cwd,
+        webrootExists,
+        fileCount = files.Count,
+        files
+    });
 });
 
 // Middleware pipeline

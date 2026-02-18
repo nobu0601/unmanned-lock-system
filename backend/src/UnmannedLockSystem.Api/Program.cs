@@ -161,6 +161,20 @@ catch (Exception ex)
 // Health check endpoint
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", time = DateTime.UtcNow }));
 
+// Debug: list wwwroot files
+app.MapGet("/debug/files", () =>
+{
+    var webroot = app.Environment.WebRootPath ?? "wwwroot";
+    if (!Directory.Exists(webroot))
+        return Results.Ok(new { error = "wwwroot not found", path = webroot, cwd = Directory.GetCurrentDirectory() });
+
+    var files = Directory.GetFiles(webroot, "*", SearchOption.AllDirectories)
+        .Select(f => f.Replace(webroot, "").Replace("\\", "/"))
+        .OrderBy(f => f)
+        .ToList();
+    return Results.Ok(new { webroot, cwd = Directory.GetCurrentDirectory(), fileCount = files.Count, files });
+});
+
 // Middleware pipeline
 app.UseSwagger();
 app.UseSwaggerUI();

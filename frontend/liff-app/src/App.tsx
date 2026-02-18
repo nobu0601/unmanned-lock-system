@@ -20,7 +20,7 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/liff">
       <div className="app">
         <header className="header">
           <h1>Unmanned Access</h1>

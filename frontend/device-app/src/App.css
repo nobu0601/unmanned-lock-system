@@ -1,0 +1,136 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #1a1a2e;
+  color: #fff;
+  overflow: hidden;
+}
+
+.device-app {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.scanner-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.scanner-header {
+  text-align: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.scanner-header h1 {
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+
+.scanner-header p {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.scanner-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.scanner-area #qr-reader {
+  width: 100% !important;
+  max-width: 600px;
+}
+
+.scanner-area #qr-reader video {
+  border-radius: 0 !important;
+}
+
+.result-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.result-overlay.granted {
+  background: rgba(6, 199, 85, 0.95);
+}
+
+.result-overlay.denied {
+  background: rgba(255, 59, 48, 0.95);
+}
+
+.result-icon {
+  font-size: 120px;
+  margin-bottom: 20px;
+}
+
+.result-text {
+  font-size: 36px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.result-detail {
+  font-size: 18px;
+  opacity: 0.8;
+  margin-top: 12px;
+}
+
+.manual-input {
+  padding: 20px;
+  text-align: center;
+  background: rgba(0,0,0,0.3);
+}
+
+.manual-input input {
+  padding: 12px 16px;
+  border: 2px solid #444;
+  border-radius: 8px;
+  background: #2a2a3e;
+  color: #fff;
+  font-size: 16px;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 8px;
+}
+
+.manual-input button {
+  padding: 12px 32px;
+  background: #4a9eff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 8px;
+}

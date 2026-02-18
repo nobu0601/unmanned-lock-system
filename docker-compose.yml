@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: unmanned_lock
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: devpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d unmanned_lock"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend/src/UnmannedLockSystem.Api
+      dockerfile: Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=unmanned_lock;Username=dev;Password=devpass
+      - UseMockPayment=true
+      - UseMockAuth=true
+      - DeviceApiKey=dev-device-key-12345
+      - Jwt__QrSecret=dev-qr-jwt-secret-key-minimum-32-characters-long!!
+      - Jwt__QrTtlSeconds=90
+      - Jwt__AdminSecret=dev-admin-secret-key-minimum-32-chars!!
+      - Jwt__AdminTokenExpiryMinutes=480
+      - Cors__Origins=http://localhost:5173,http://localhost:5174,http://localhost:5175
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5000:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
